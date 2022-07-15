@@ -1,0 +1,78 @@
+import java.util.LinkedList; 
+ import java.util.Scanner; 
+  
+ class Process { 
+     public int processId; 
+     public int burstTime; 
+     public int waitingTime; 
+     public int turnAroundTime; 
+     public int remainingTime; 
+     public int lastAccessTime; 
+  
+     Process(int processId, int burstTime) { 
+         this.processId = processId; 
+         this.burstTime = burstTime; 
+         this.remainingTime = burstTime; 
+     } 
+ } 
+public class RoundRobin {
+	private static LinkedList<Process> processQueue; 
+    private static Process[] processes; //array of objects
+ 
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+		 Scanner scanner = new Scanner(System.in); 
+         System.out.println("Enter number of Processes"); 
+         int n = scanner.nextInt(); 
+         processes = new Process[n]; 
+         processQueue = new LinkedList<>(); 
+  
+         System.out.println("Enter details"); 
+         for (int i = 0; i < n; i++) { 
+             System.out.println("Enter burst time for Process " + (i + 1)); 
+             int burstTime = scanner.nextInt(); 
+             processes[i] = new Process(i + 1, burstTime); 
+  
+             processQueue.add(processes[i]); 
+         } 
+  
+         System.out.println("Enter Quantum Size"); 
+         int quantumSize = scanner.nextInt(); 
+  
+         int currentTime = 0; 
+         System.out.println("Process Scheduling"); 
+         while (!processQueue.isEmpty()) { 
+             Process p = processQueue.pollFirst(); //to remove the first element from the queue
+             p.waitingTime += currentTime - p.lastAccessTime; 
+             System.out.println("Current Time: " + currentTime + ", Id: " + p.processId); 
+  
+             if (p.remainingTime > quantumSize) { 
+                 p.remainingTime -= quantumSize; 
+                 currentTime += quantumSize; 
+                 p.lastAccessTime = currentTime; 
+  
+                 processQueue.offerLast(p); //to insert the ele at the end of the queue
+             } else { 
+                 currentTime += p.remainingTime; 
+                 p.remainingTime = 0; 
+             } 
+         } 
+         System.out.println("Current Time: " + currentTime); 
+  
+         float averageWaitTime = 0f, averageTurnAroundTime = 0f; 
+         for (int i = 0; i < n; i++) { 
+             processes[i].turnAroundTime = processes[i].burstTime + processes[i].waitingTime; 
+  
+             averageWaitTime += processes[i].waitingTime; 
+             averageTurnAroundTime += processes[i].turnAroundTime; 
+         } 
+  
+         averageWaitTime /= n; 
+         averageTurnAroundTime /= n; 
+  
+         System.out.println("Average Wait Time: " + averageWaitTime + ", Average Turn Around Time: " + averageTurnAroundTime); 
+	}
+
+}
